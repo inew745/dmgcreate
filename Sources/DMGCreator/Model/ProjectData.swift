@@ -53,8 +53,8 @@ struct ProjectData: Codable, Equatable {
     var volumeName: String = "My App"
     var outputPath: String = ""
 
-    var backgroundPath: String = ""
-    var background2xPath: String = ""
+    var backgroundPath: String = AppResources.defaultBackgroundPath ?? ""
+    var background2xPath: String = AppResources.defaultBackground2xPath ?? ""
     var volumeIconPath: String = ""
 
     var windowX: Int = 200
@@ -62,7 +62,7 @@ struct ProjectData: Codable, Equatable {
     var windowWidth: Int = 660
     var windowHeight: Int = 400
 
-    var iconSize: Int = 128
+    var iconSize: Int = 104
     var textSize: Int = 12
 
     var format: DMGFormat = .udzo
@@ -98,6 +98,10 @@ struct ProjectData: Codable, Equatable {
 
     /// A default output location derived from the volume name, used until the
     /// person picks one themselves.
+    /// Where the two icon slots sit in the background the app ships with.
+    static let appSlot = CGPoint(x: 181, y: 186)
+    static let applicationsSlot = CGPoint(x: 471, y: 186)
+
     static func suggestedOutputPath(for volumeName: String) -> String {
         let name = volumeName.trimmingCharacters(in: .whitespacesAndNewlines)
         let file = (name.isEmpty ? "Untitled" : name)

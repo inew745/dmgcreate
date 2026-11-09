@@ -25,7 +25,7 @@ final class ProjectModel: ObservableObject {
 
     init() {
         data.outputPath = ProjectData.suggestedOutputPath(for: data.volumeName)
-        data.items = [DMGItem.applicationsLink(at: CGPoint(x: 480, y: 185))]
+        data.items = [DMGItem.applicationsLink(at: ProjectData.applicationsSlot)]
     }
 
     // MARK: - Document
@@ -41,7 +41,7 @@ final class ProjectModel: ObservableObject {
     func newProject() {
         data = ProjectData()
         data.outputPath = ProjectData.suggestedOutputPath(for: data.volumeName)
-        data.items = [DMGItem.applicationsLink(at: CGPoint(x: 480, y: 185))]
+        data.items = [DMGItem.applicationsLink(at: ProjectData.applicationsSlot)]
         projectURL = nil
         hasUnsavedChanges = false
         logLines = []
@@ -81,8 +81,13 @@ final class ProjectModel: ObservableObject {
     /// Adds files, skipping anything already in the project, and lays new
     /// items out from the given point (or the middle of the window).
     func addItems(urls: [URL], at dropPoint: CGPoint? = nil) {
-        var next = dropPoint ?? CGPoint(x: CGFloat(data.windowWidth) / 3,
-                                        y: CGFloat(data.windowHeight) / 2)
+        // With no drop point, the first app lands in the left-hand slot of the
+        // background the app ships with; anything after that is placed beside it.
+        let firstFree = data.items.allSatisfy { $0.isApplicationsLink }
+        var next = dropPoint
+            ?? (firstFree ? ProjectData.appSlot
+                          : CGPoint(x: CGFloat(data.windowWidth) / 3,
+                                    y: CGFloat(data.windowHeight) / 2))
         for url in urls {
             let path = url.standardizedFileURL.path
             if data.items.contains(where: { $0.sourcePath == path }) { continue }
@@ -118,9 +123,12 @@ final class ProjectModel: ObservableObject {
     func setApplicationsLink(_ enabled: Bool) {
         if enabled {
             guard !data.hasApplicationsLink else { return }
-            let x = CGFloat(data.windowWidth) * 0.75
-            let y = CGFloat(data.windowHeight) * 0.5
-            data.items.append(DMGItem.applicationsLink(at: clamp(CGPoint(x: x, y: y))))
+            let isDefaultWindow = data.windowWidth == 660 && data.windowHeight == 400
+            let spot = isDefaultWindow
+                ? ProjectData.applicationsSlot
+                : CGPoint(x: CGFloat(data.windowWidth) * 0.75,
+                          y: CGFloat(data.windowHeight) * 0.5)
+            data.items.append(DMGItem.applicationsLink(at: clamp(spot)))
         } else {
             data.items.removeAll { $0.isApplicationsLink }
         }

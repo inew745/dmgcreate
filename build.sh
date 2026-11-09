@@ -102,9 +102,9 @@ chmod +x "$APP_BUNDLE/Contents/MacOS/$EXECUTABLE"
 cp "$ROOT/scripts/make-dmg.sh" "$APP_BUNDLE/Contents/Resources/make-dmg.sh"
 chmod +x "$APP_BUNDLE/Contents/Resources/make-dmg.sh"
 
-# Sample artwork, so a new project has something to show.
-cp "$ROOT/assets/sample-background.png" "$APP_BUNDLE/Contents/Resources/" 2>/dev/null || true
-cp "$ROOT/assets/sample-background@2x.png" "$APP_BUNDLE/Contents/Resources/" 2>/dev/null || true
+# The background every new project starts with.
+cp "$ROOT/assets/default-background.png" "$APP_BUNDLE/Contents/Resources/" 2>/dev/null || true
+cp "$ROOT/assets/default-background@2x.png" "$APP_BUNDLE/Contents/Resources/" 2>/dev/null || true
 
 printf 'APPL????' > "$APP_BUNDLE/Contents/PkgInfo"
 
@@ -179,9 +179,9 @@ step "Built $APP_BUNDLE"
 # ----------------------------------------------------------------------------
 if [ "$MAKE_DMG" -eq 1 ]; then
     step "Packaging the app into a disk image"
-    if [ -f "$ROOT/assets/dmg-background.png" ]; then
-        set -- --background "$ROOT/assets/dmg-background.png"
-        [ -f "$ROOT/assets/dmg-background@2x.png" ] && set -- "$@" --background-2x "$ROOT/assets/dmg-background@2x.png"
+    if [ -f "$ROOT/assets/default-background.png" ]; then
+        set -- --background "$ROOT/assets/default-background.png"
+        [ -f "$ROOT/assets/default-background@2x.png" ] && set -- "$@" --background-2x "$ROOT/assets/default-background@2x.png"
     else
         set --
     fi
@@ -189,11 +189,11 @@ if [ "$MAKE_DMG" -eq 1 ]; then
         --volname "$APP_NAME" \
         --output "$BUILD_DIR/DMG-Creator-$VERSION.dmg" \
         --window-size 660,400 \
-        --icon-size 128 \
+        --icon-size 104 \
         --add "$APP_BUNDLE" \
-        --pos "$APP_NAME.app:180,185" \
+        --pos "$APP_NAME.app:181,186" \
         --applications-link \
-        --pos "Applications:480,185" \
+        --pos "Applications:471,186" \
         "$@"
     step "Disk image: $BUILD_DIR/DMG-Creator-$VERSION.dmg"
 fi

@@ -194,8 +194,8 @@ struct InspectorView: View {
                 get: { model.snapToGrid },
                 set: { model.snapToGrid = $0 }))
 
-            Button("Use Classic App Layout") { applyClassicLayout() }
-                .help("660 × 400 window, app on the left, Applications on the right.")
+            Button("Snap to the Background's Slots") { applyClassicLayout() }
+                .help("660 × 400 window, with the icons centred in the two slots of the default background.")
         }
     }
 
@@ -235,16 +235,14 @@ struct InspectorView: View {
     private func applyClassicLayout() {
         model.data.windowWidth = 660
         model.data.windowHeight = 400
-        model.data.iconSize = 128
+        model.data.iconSize = 104
         if !model.data.hasApplicationsLink {
             model.setApplicationsLink(true)
         }
         for index in model.data.items.indices {
-            if model.data.items[index].isApplicationsLink {
-                model.data.items[index].position = CGPoint(x: 480, y: 185)
-            } else {
-                model.data.items[index].position = CGPoint(x: 180, y: 185)
-            }
+            model.data.items[index].position = model.data.items[index].isApplicationsLink
+                ? ProjectData.applicationsSlot
+                : ProjectData.appSlot
         }
         model.clampAllItems()
         model.markDirty()

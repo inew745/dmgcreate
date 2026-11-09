@@ -8,10 +8,13 @@ Drop an app in, drop a background image in, drag the icons where you want
 them, press **Build DMG**. What the preview shows is what the Finder shows
 when the image is mounted.
 
-![App icon](assets/appicon.png)
+![The background new projects start with](assets/default-background.png)
 
 ## What it does
 
+- **Starts ready to go**: every new project opens with the dark two-slot
+  background below, 660 × 400, with the `Applications` shortcut already in its
+  slot. Drop your app in the left slot and build.
 - **Live preview** of the mounted window: real background image, real icon
   sizes, real positions. Drag icons around; the numbers are the ones written
   into the image.
@@ -63,11 +66,12 @@ image still builds, just without the styling, and the log says so.
 ## Using it
 
 1. **Volume** — the name shown when the image is mounted (27 characters max).
-2. **Background** — choose a PNG, then press *Match Window Size to Image* so
-   the artwork fills the window exactly. `assets/sample-background.png` is a
-   660 × 400 starting point you can edit.
-3. **Contents** — drag your `.app` onto the preview, and leave the
-   *Applications* shortcut on so people can drag the app across.
+2. **Background** — the default one is already set. To use your own, choose a
+   PNG and press *Match Window Size to Image* so the artwork fills the window
+   exactly.
+3. **Contents** — drag your `.app` onto the preview. With the default
+   background it lands in the left slot, and the *Applications* shortcut is
+   already in the right one.
 4. **Position** — drag the icons. They snap to an 8 pt grid unless you turn
    that off.
 5. **Output** — pick where the `.dmg` goes and press **Build DMG** (⌘B).
@@ -76,12 +80,21 @@ Save the project (⌘S) and the next release is one keystroke.
 
 ### Designing a background
 
-- Make the image exactly the window size — 660 × 400 is the classic one.
+- Make the image exactly the window size — 660 × 400 is the classic one, and
+  what the bundled background uses.
 - Add a second file named `background@2x.png` at double the pixels
   (1320 × 800). The app picks it up automatically when it sits next to the
   first one.
 - Leave room where the icons go. Icon positions are the *centre* of the icon,
-  which is what the preview draws.
+  which is what the preview draws. The bundled background has its two slots
+  centred at 181, 186 and 471, 186, sized for 104 pt icons.
+- `assets/make-assets.py` draws the bundled background and app icon. Edit the
+  constants at the top of the file and run it to make a variant at both
+  resolutions:
+
+  ```bash
+  python3 assets/make-assets.py
+  ```
 
 ## The command line tool
 
@@ -93,14 +106,14 @@ dependencies beyond macOS itself:
 scripts/make-dmg.sh \
     --volname "My App" \
     --output ~/Desktop/MyApp.dmg \
-    --background assets/sample-background.png \
-    --background-2x assets/sample-background@2x.png \
+    --background assets/default-background.png \
+    --background-2x assets/default-background@2x.png \
     --window-size 660,400 \
-    --icon-size 128 \
+    --icon-size 104 \
     --add "build/My App.app" \
-    --pos "My App.app:180,185" \
+    --pos "My App.app:181,186" \
     --applications-link \
-    --pos "Applications:480,185"
+    --pos "Applications:471,186"
 ```
 
 `scripts/make-dmg.sh --help` lists every option. The app's **terminal button**
@@ -127,8 +140,8 @@ Sources/DMGCreator/           SwiftUI app
     Core/                     builder, image helpers, panels
     Views/                    inspector, preview canvas, build pane
 scripts/make-dmg.sh           the disk image engine, usable on its own
-assets/                       app icon and sample backgrounds
-    make-assets.py            regenerates the artwork
+assets/                       app icon and the default background (1x and 2x)
+    make-assets.py            draws all of it; run it to change the artwork
 build.sh                      compiles and assembles DMG Creator.app
 ```
 
