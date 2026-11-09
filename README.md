@@ -87,7 +87,8 @@ Save the project (⌘S) and the next release is one keystroke.
   first one.
 - Leave room where the icons go. Icon positions are the *centre* of the icon,
   which is what the preview draws. The bundled background has its two slots
-  centred at 181, 186 and 471, 186, sized for 104 pt icons.
+  centred at 181, 186 and 471, 186, sized for 104 pt icons, and the name
+  plate under each slot is where the Finder draws the item's name.
 - `assets/make-assets.py` draws the bundled background and app icon. Edit the
   constants at the top of the file and run it to make a variant at both
   resolutions:

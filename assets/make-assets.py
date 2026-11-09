@@ -163,6 +163,14 @@ SLOT_LEFT_X = 113
 SLOT_RIGHT_X = 403
 SLOT_FILL = (217, 217, 217)
 
+# The outlined plate at the foot of each slot, where the Finder draws the
+# item's name. Centred on the slot, straddling its bottom edge.
+PLATE_WIDTH = 118
+PLATE_HEIGHT = 28.5
+PLATE_CENTRE_Y = 251.2
+PLATE_RADIUS = 13
+PLATE_STROKE = 2.6
+
 # Hue (degrees) along the top-left to bottom-right diagonal of a slot.
 HUE_STOPS = [
     (0.000, 300.0), (0.080, 271.0), (0.248, 212.0), (0.390, 163.0),
@@ -228,6 +236,23 @@ def draw_slot(canvas, x, y, scale):
     canvas.alpha_composite(slot, (x, y))
 
 
+def draw_label_plate(canvas, slot_x, scale):
+    """The outlined name plate under a slot."""
+    centre_x = (slot_x + SLOT_SIZE / 2) * scale
+    centre_y = PLATE_CENTRE_Y * scale
+    half_w = PLATE_WIDTH * scale / 2
+    half_h = PLATE_HEIGHT * scale / 2
+
+    plate = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    ImageDraw.Draw(plate).rounded_rectangle(
+        [centre_x - half_w, centre_y - half_h, centre_x + half_w, centre_y + half_h],
+        radius=PLATE_RADIUS * scale,
+        fill=SLOT_FILL + (255,),
+        outline=(0, 0, 0, 255),
+        width=round(PLATE_STROKE * scale))
+    canvas.alpha_composite(plate)
+
+
 def draw_arrow(canvas, scale):
     """The curved double-headed arrow between the two slots."""
     import math
@@ -287,8 +312,10 @@ def make_background(path, width=660, height=400, scale=1, lines=None, supersampl
     shade = vignette.point(lambda v: 57 + round(v * 4 / 255))
     canvas = Image.merge("RGB", (shade, shade, shade)).convert("RGBA")
 
-    draw_slot(canvas, SLOT_LEFT_X * s, SLOT_Y * s, s)
-    draw_slot(canvas, SLOT_RIGHT_X * s, SLOT_Y * s, s)
+    for slot_x in (SLOT_LEFT_X, SLOT_RIGHT_X):
+        draw_slot(canvas, slot_x * s, SLOT_Y * s, s)
+    for slot_x in (SLOT_LEFT_X, SLOT_RIGHT_X):
+        draw_label_plate(canvas, slot_x, s)
     draw_arrow(canvas, s)
     draw_caption(canvas, s, lines=lines)
 
