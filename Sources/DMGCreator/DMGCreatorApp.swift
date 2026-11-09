@@ -51,6 +51,8 @@ struct DMGCreatorApp: App {
                 Divider()
                 Button("Show Last Build in Finder") { model.revealLastBuild() }
                     .disabled(model.lastBuiltDMG == nil)
+                Button("Clear Build List") { model.history.clear() }
+                    .disabled(model.history.records.isEmpty)
             }
         }
     }

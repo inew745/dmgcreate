@@ -4,8 +4,15 @@ import AppKit
 /// The build button, progress, and the log coming back from make-dmg.sh.
 struct BuildPane: View {
 
+    enum Pane: String, CaseIterable, Identifiable {
+        case log = "Log"
+        case builds = "Builds"
+        var id: String { rawValue }
+    }
+
     @EnvironmentObject var model: ProjectModel
-    @State private var showLog = true
+    @State private var showPane = true
+    @State private var pane: Pane = .log
 
     private var problems: [String] { model.data.validationProblems() }
 
@@ -13,9 +20,15 @@ struct BuildPane: View {
         VStack(spacing: 0) {
             Divider()
             controls
-            if showLog {
+            if showPane {
                 Divider()
-                logView
+                switch pane {
+                case .log:
+                    logView
+                case .builds:
+                    BuildsListView(history: model.history)
+                        .frame(height: 150)
+                }
             }
         }
         .background(Color(nsColor: .windowBackgroundColor))
@@ -58,11 +71,25 @@ struct BuildPane: View {
             }
             .help("Copy the equivalent command line")
 
-            Toggle(isOn: $showLog) {
-                Image(systemName: "text.alignleft")
+            Picker("", selection: $pane) {
+                ForEach(Pane.allCases) { option in
+                    Text(option == .builds && !model.history.records.isEmpty
+                         ? "Builds (\(model.history.records.count))"
+                         : option.rawValue)
+                        .tag(option)
+                }
             }
-            .toggleStyle(.button)
-            .help("Show the build log")
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(width: 160)
+            .onChange(of: pane) { _ in showPane = true }
+
+            Button {
+                showPane.toggle()
+            } label: {
+                Image(systemName: showPane ? "chevron.down" : "chevron.up")
+            }
+            .help(showPane ? "Hide this pane" : "Show this pane")
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

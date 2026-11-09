@@ -1,6 +1,7 @@
 import Foundation
 import CoreGraphics
 import AppKit
+import Combine
 
 /// Holds the document being edited plus the transient state around it: the
 /// build log, whether a build is running, where the last image landed.
@@ -19,11 +20,20 @@ final class ProjectModel: ObservableObject {
     @Published var selectedItemID: UUID?
 
     @Published var snapToGrid = true
+
+    /// Every image built so far, kept between launches.
+    let history = BuildHistory()
     let gridStep: CGFloat = 8
 
     private var builder: DMGBuilder?
+    private var historyObserver: AnyCancellable?
 
     init() {
+        // The build list is its own object, so pass its changes on to anything
+        // watching the model.
+        historyObserver = history.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
         data.outputPath = ProjectData.suggestedOutputPath(for: data.volumeName)
         data.items = [DMGItem.applicationsLink(at: ProjectData.applicationsSlot)]
     }
@@ -225,6 +235,7 @@ final class ProjectModel: ObservableObject {
                 switch result {
                 case .success(let url):
                     self.lastBuiltDMG = url
+                    self.history.record(project: self.data, dmg: url)
                 case .failure(let error):
                     self.errorMessage = error.localizedDescription
                 }

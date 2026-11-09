@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DMG Creator — disk images that look like you meant it</title>
+<meta name="description" content="A Mac app for building .dmg files with a custom background and hand-placed icons. Drag the icons where you want them, press build. Free and open source.">
+<meta name="theme-color" content="#2f2f31">
+<meta property="og:title" content="DMG Creator for macOS">
+<meta property="og:description" content="Build .dmg files with a custom background and hand-placed icons. What you see is what mounts.">
+<meta property="og:image" content="assets/default-background.png">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/appicon.png">
+<link rel="preload" as="image" href="assets/default-background.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top">
+    <img src="assets/appicon.png" alt="" width="30" height="30">
+    <span>DMG&nbsp;Creator</span>
+  </a>
+  <nav class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#terminal">Terminal</a>
+    <a href="https://github.com/inew745/dmgcreate">GitHub</a>
+  </nav>
+  <a class="btn btn-small" href="download/DMG-Creator-1.0.0.dmg" download>Download</a>
+</header>
+
+<main id="top">
+
+  <!-- ───────────────────────────── hero ───────────────────────────── -->
+  <section class="hero">
+    <div class="glow" data-parallax="0.18" aria-hidden="true"></div>
+
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Free · Open source · macOS 13+</p>
+      <h1>Disk images that look<br>like you meant it.</h1>
+      <p class="lede">
+        Drop in your app. Drop in a background. Drag the icons where you want
+        them. Press build — and the window that mounts is the one you just drew.
+      </p>
+      <div class="cta">
+        <a class="btn btn-rainbow" href="download/DMG-Creator-1.0.0.dmg" download>
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3v11m0 0 4.2-4.2M12 14l-4.2-4.2M4.5 17.5v1A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5v-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download for macOS
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/inew745/dmgcreate">Browse the source</a>
+      </div>
+      <p class="meta">Version 1.0.0 · 833&nbsp;KB · Apple&nbsp;silicon &amp; Intel</p>
+    </div>
+
+    <figure class="hero-art reveal" data-parallax="-0.06">
+      <div class="window" aria-label="A mounted disk image window with an app icon and the Applications folder">
+        <div class="titlebar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><em>My App</em></div>
+        <div class="window-body">
+          <img class="bg" src="assets/default-background.png" alt="" width="660" height="400">
+          <figure class="slot slot-app">
+            <img src="assets/appicon.png" alt="" width="104" height="104">
+            <figcaption>My App</figcaption>
+          </figure>
+          <figure class="slot slot-dest">
+            <img src="assets/applications-folder.png" alt="" width="104" height="104">
+            <figcaption>Applications</figcaption>
+          </figure>
+        </div>
+      </div>
+    </figure>
+  </section>
+
+  <!-- ─────────────────────── scroll-driven demo ─────────────────────── -->
+  <section class="demo" id="demo">
+    <div class="demo-sticky">
+      <div class="window demo-window">
+        <div class="titlebar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><em>My App</em></div>
+        <div class="window-body">
+          <img class="bg" src="assets/default-background.png" alt="" width="660" height="400">
+          <figure class="slot slot-dest">
+            <img src="assets/applications-folder.png" alt="" width="104" height="104">
+            <figcaption>Applications</figcaption>
+          </figure>
+          <figure class="slot slot-drag" id="dragIcon">
+            <img src="assets/appicon.png" alt="" width="104" height="104">
+            <figcaption>My App</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <ol class="demo-captions" id="demoCaptions">
+        <li data-at="0"><strong>Place it.</strong> Drag an icon anywhere in the window. The preview is the real thing at the real size.</li>
+        <li data-at="1"><strong>Snap it.</strong> Positions land on an 8&nbsp;pt grid, so two icons line up without fiddling.</li>
+        <li data-at="2"><strong>Ship it.</strong> Those coordinates go straight into the image. Nobody has to drag anything twice.</li>
+      </ol>
+    </div>
+    <div class="demo-scroll" aria-hidden="true"></div>
+  </section>
+
+  <!-- ───────────────────────────── features ───────────────────────────── -->
+  <section class="features" id="features">
+    <h2 class="reveal">Everything the Finder hides from you</h2>
+    <p class="section-lede reveal">Background pictures, window geometry and icon positions all live in a file the Finder writes and never shows you. This app writes it for you.</p>
+
+    <div class="grid">
+      <article class="card reveal">
+        <span class="card-icon">🖼️</span>
+        <h3>Custom background</h3>
+        <p>Any PNG, at the exact window size. Add a <code>@2x</code> copy and both are packed into one multi-resolution TIFF, so Retina stays sharp.</p>
+      </article>
+      <article class="card reveal">
+        <span class="card-icon">🎯</span>
+        <h3>Drag to position</h3>
+        <p>Icons move where you drag them, snapped to a grid. What the canvas shows is what the mounted window shows.</p>
+      </article>
+      <article class="card reveal">
+        <span class="card-icon">📦</span>
+        <h3>The Applications shortcut</h3>
+        <p>One toggle adds the symlink everyone expects, already sitting in its slot in the bundled background.</p>
+      </article>
+      <article class="card reveal">
+        <span class="card-icon">🗜️</span>
+        <h3>Five formats</h3>
+        <p>zlib, lzfse, bzip2, lzma or uncompressed — and an optional Developer&nbsp;ID signature on the finished image.</p>
+      </article>
+      <article class="card reveal">
+        <span class="card-icon">🗂️</span>
+        <h3>Build list</h3>
+        <p>Every image you make is remembered. Mount it, show it in the Finder, or load its settings back in and build it again.</p>
+      </article>
+      <article class="card reveal">
+        <span class="card-icon">⌨️</span>
+        <h3>A real command line</h3>
+        <p>The app is a front end for one dependency-free bash script. Copy the exact command it ran and drop it in your release script.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ───────────────────────────── how it works ───────────────────────────── -->
+  <section class="how" id="how">
+    <div class="how-head reveal">
+      <h2>Four steps, no magic</h2>
+      <p class="section-lede">The parts you would have written yourself, in the order you would have written them.</p>
+    </div>
+
+    <ol class="steps" id="steps">
+      <li class="step reveal">
+        <span class="step-n">01</span>
+        <h3>Stage</h3>
+        <p>Your app, a hidden <code>.background</code> folder and the <code>Applications</code> symlink are copied into a staging folder with <code>ditto</code>, resource forks intact.</p>
+      </li>
+      <li class="step reveal">
+        <span class="step-n">02</span>
+        <h3>Mount</h3>
+        <p><code>hdiutil</code> turns that folder into a writable HFS+ image, sized for the contents, and mounts it.</p>
+      </li>
+      <li class="step reveal">
+        <span class="step-n">03</span>
+        <h3>Arrange</h3>
+        <p>An AppleScript hands the Finder your window bounds, icon size, background picture and every icon position. The Finder writes it into <code>.DS_Store</code>.</p>
+      </li>
+      <li class="step reveal">
+        <span class="step-n">04</span>
+        <h3>Compress</h3>
+        <p>The volume is unmounted and converted into the finished read-only image — then signed, if you asked for that.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ───────────────────────────── terminal ───────────────────────────── -->
+  <section class="terminal-section" id="terminal">
+    <div class="terminal-copy reveal">
+      <h2>Or skip the window entirely</h2>
+      <p class="section-lede">
+        <code>make-dmg.sh</code> is the same engine the app runs, with no dependencies
+        beyond macOS itself. The app's terminal button copies the exact command for
+        whatever you have open.
+      </p>
+    </div>
+
+    <div class="terminal reveal" id="terminal-box">
+      <div class="terminal-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><em>zsh</em></div>
+      <pre><code id="typed"></code><span class="caret" id="caret"></span></pre>
+    </div>
+  </section>
+
+  <!-- ───────────────────────────── download ───────────────────────────── -->
+  <section class="download reveal" id="download">
+    <img src="assets/appicon.png" alt="" width="104" height="104" class="download-icon">
+    <h2>Get DMG Creator</h2>
+    <p class="section-lede">Free, open source, and about the size of a photo.</p>
+    <a class="btn btn-rainbow btn-big" href="download/DMG-Creator-1.0.0.dmg" download>Download for macOS</a>
+    <dl class="specs">
+      <div><dt>Version</dt><dd>1.0.0</dd></div>
+      <div><dt>Size</dt><dd>833 KB</dd></div>
+      <div><dt>Requires</dt><dd>macOS 13+</dd></div>
+      <div><dt>Licence</dt><dd>MIT</dd></div>
+    </dl>
+    <p class="note">
+      The app is signed locally rather than notarised, so the first launch needs
+      <strong>right-click ▸ Open</strong>. The first build asks permission to control
+      the Finder — that is how the background and icon positions get set.
+    </p>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Built with DMG Creator, naturally.</p>
+  <p><a href="https://github.com/inew745/dmgcreate">Source on GitHub</a> · MIT licence</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

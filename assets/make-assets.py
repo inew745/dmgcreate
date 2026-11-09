@@ -324,6 +324,73 @@ def make_background(path, width=660, height=400, scale=1, lines=None, supersampl
     return path
 
 
+# ---------------------------------------------------------------------------
+# Artwork for the download site in docs/
+# ---------------------------------------------------------------------------
+def make_folder_icon(path, size=512):
+    """A macOS-style blue folder, used in the website's window mock-up."""
+    ss = 4
+    s = size * ss
+    image = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+
+    body_top = int(s * 0.26)
+    left, right = int(s * 0.055), int(s * 0.945)
+    bottom = int(s * 0.845)
+    radius = int(s * 0.06)
+
+    # The tab along the back of the folder.
+    back = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    bdraw = ImageDraw.Draw(back)
+    bdraw.rounded_rectangle([left, int(s * 0.175), int(s * 0.47), body_top + radius],
+                            radius=int(s * 0.035), fill=(86, 170, 235, 255))
+    bdraw.rounded_rectangle([left, int(s * 0.21), right, bottom],
+                            radius=radius, fill=(96, 180, 242, 255))
+    image.alpha_composite(back)
+
+    # The front face, a touch lighter, with a soft top edge highlight.
+    front = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    fdraw = ImageDraw.Draw(front)
+    face = vertical_gradient((right - left, bottom - body_top), (126, 201, 250), (64, 150, 228))
+    face = face.convert("RGBA")
+    mask = Image.new("L", (right - left, bottom - body_top), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, right - left - 1, bottom - body_top - 1],
+                                           radius=radius, fill=255)
+    face.putalpha(mask)
+    front.alpha_composite(face, (left, body_top))
+    fdraw.line([(left + radius, body_top + int(s * 0.004)),
+                (right - radius, body_top + int(s * 0.004))],
+               fill=(196, 230, 255, 140), width=int(s * 0.008))
+    image.alpha_composite(front)
+
+    shadow = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    ImageDraw.Draw(shadow).rounded_rectangle(
+        [left, body_top + int(s * 0.02), right, bottom + int(s * 0.02)],
+        radius=radius, fill=(20, 60, 100, 70))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(s * 0.012))
+    combined = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    combined.alpha_composite(shadow)
+    combined.alpha_composite(image)
+
+    combined.resize((size, size), Image.LANCZOS).save(path)
+    return path
+
+
+def copy_site_assets():
+    """Mirror the artwork the website needs into docs/assets."""
+    site = os.path.join(os.path.dirname(HERE), "docs", "assets")
+    if not os.path.isdir(site):
+        return []
+    written = [make_folder_icon(os.path.join(site, "applications-folder.png"))]
+    for name in ("appicon.png", "default-background.png", "default-background@2x.png"):
+        source = os.path.join(HERE, name)
+        if os.path.exists(source):
+            target = os.path.join(site, name)
+            with open(source, "rb") as src, open(target, "wb") as dst:
+                dst.write(src.read())
+            written.append(target)
+    return written
+
+
 if __name__ == "__main__":
     print(make_app_icon(os.path.join(HERE, "appicon.png")))
 
@@ -331,3 +398,6 @@ if __name__ == "__main__":
     # own disk image uses (./build.sh --dmg).
     print(make_background(os.path.join(HERE, "default-background.png"), scale=1))
     print(make_background(os.path.join(HERE, "default-background@2x.png"), scale=2))
+
+    for path in copy_site_assets():
+        print(path)

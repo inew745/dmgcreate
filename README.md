@@ -26,9 +26,20 @@ when the image is mounted.
 - **Custom volume icon** (`.icns`).
 - **Compression**: zlib, lzfse, bzip2, lzma, or uncompressed.
 - **Code signing** of the finished image with your Developer ID.
+- **Build list**: every image you make is remembered. Mount it, show it in the
+  Finder, or load its settings back in and build it again.
 - **Projects** save to `.dmgproj` files, so a release build is repeatable.
 - Everything the app does is also available as a **command line tool**, and
   the app shows you the exact command it ran.
+
+## Download
+
+A built, ready-to-run copy lives in [`docs/download`](docs/download), and
+[`docs/`](docs) is a download page for it — turn on GitHub Pages for the
+`docs` folder (Settings ▸ Pages ▸ Deploy from a branch) and it is live. No
+Actions, no build step; it is plain HTML, CSS and one script.
+
+To build it yourself instead, read on.
 
 ## Requirements
 
@@ -143,6 +154,8 @@ Sources/DMGCreator/           SwiftUI app
 scripts/make-dmg.sh           the disk image engine, usable on its own
 assets/                       app icon and the default background (1x and 2x)
     make-assets.py            draws all of it; run it to change the artwork
+docs/                         the download site (GitHub Pages serves this folder)
+    download/                 the built .dmg the site hands out
 build.sh                      compiles and assembles DMG Creator.app
 ```
 
