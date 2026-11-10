@@ -221,10 +221,25 @@ code {
 .slot-app  { left: calc(181px * var(--scale)); top: calc(186px * var(--scale)); }
 .slot-dest { left: calc(471px * var(--scale)); top: calc(186px * var(--scale)); }
 
+/* the hero shows a real mounted window rather than a mock-up */
 .hero-art { margin: 0; }
-.hero-art .window { --scale: .84; }
-@media (max-width: 949px) { .hero-art .window { --scale: .62; } }
-@media (max-width: 560px) { .hero-art .window { --scale: .46; } }
+.shot {
+    display: block;
+    width: min(617px, 100%);
+    height: auto;
+    filter: drop-shadow(0 24px 44px #000000a6);
+}
+.hero-art figcaption {
+    color: var(--faint);
+    font-size: 0.86rem;
+    line-height: 1.5;
+    margin-top: 16px;
+    max-width: 40ch;
+}
+@media (max-width: 949px) {
+    .hero-art { margin-top: 10px; }
+    .hero-art figcaption { max-width: none; }
+}
 
 /* ── scroll-driven demo ──────────────────────────────────────────── */
 .demo { position: relative; }
