@@ -161,4 +161,7 @@ build.sh                      compiles and assembles DMG Creator.app
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE).
+Proprietary. All rights reserved — see [LICENSE](LICENSE).
+
+The app is free to download and use. The source is not licensed for reuse,
+redistribution or modification.

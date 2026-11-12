@@ -123,10 +123,11 @@
 
     /* ── the terminal types itself out once it is on screen ───────── */
     var COMMAND = [
-        ['./scripts/make-dmg.sh', 'tok-cmd'], [' \\\n    ', ''],
+        ['"/Applications/DMG Creator.app/Contents/Resources/make-dmg.sh"', 'tok-cmd'],
+        [' \\\n    ', ''],
         ['--volname', 'tok-flag'], [' ', ''], ['"My App"', 'tok-str'], [' \\\n    ', ''],
         ['--output', 'tok-flag'], [' ~/Desktop/MyApp.dmg \\\n    ', ''],
-        ['--background', 'tok-flag'], [' assets/default-background.png \\\n    ', ''],
+        ['--background', 'tok-flag'], [' ~/art/background.png \\\n    ', ''],
         ['--window-size', 'tok-flag'], [' 660,400 \\\n    ', ''],
         ['--icon-size', 'tok-flag'], [' 104 \\\n    ', ''],
         ['--add', 'tok-flag'], [' ', ''], ['"build/My App.app"', 'tok-str'], [' \\\n    ', ''],
