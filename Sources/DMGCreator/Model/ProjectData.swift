@@ -68,7 +68,59 @@ struct ProjectData: Codable, Equatable {
     var format: DMGFormat = .udzo
     var codesignIdentity: String = ""
 
+    /// Sign any .app that arrives without a signature. An unsigned arm64
+    /// binary will not launch on Apple silicon, so this is on by default.
+    /// Apps that are already signed are never re-signed.
+    var signUnsignedApps: Bool = true
+    /// Identity used for that. Empty means an ad-hoc signature.
+    var appSigningIdentity: String = ""
+
     var items: [DMGItem] = []
+
+    // MARK: - Decoding
+    //
+    // Written by hand so that a project saved by an older version, or a build
+    // recorded before a field existed, still opens: anything missing falls
+    // back to the default above.
+
+    enum CodingKeys: String, CodingKey {
+        case volumeName, outputPath
+        case backgroundPath, background2xPath, volumeIconPath
+        case windowX, windowY, windowWidth, windowHeight
+        case iconSize, textSize
+        case format, codesignIdentity
+        case signUnsignedApps, appSigningIdentity
+        case items
+    }
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let box = try decoder.container(keyedBy: CodingKeys.self)
+        func value<T: Decodable>(_ key: CodingKeys, _ fallback: T) -> T {
+            guard let present = try? box.decodeIfPresent(T.self, forKey: key),
+                  let decoded = present else { return fallback }
+            return decoded
+        }
+        let blank = ProjectData()
+
+        volumeName = value(.volumeName, blank.volumeName)
+        outputPath = value(.outputPath, blank.outputPath)
+        backgroundPath = value(.backgroundPath, blank.backgroundPath)
+        background2xPath = value(.background2xPath, blank.background2xPath)
+        volumeIconPath = value(.volumeIconPath, blank.volumeIconPath)
+        windowX = value(.windowX, blank.windowX)
+        windowY = value(.windowY, blank.windowY)
+        windowWidth = value(.windowWidth, blank.windowWidth)
+        windowHeight = value(.windowHeight, blank.windowHeight)
+        iconSize = value(.iconSize, blank.iconSize)
+        textSize = value(.textSize, blank.textSize)
+        format = value(.format, blank.format)
+        codesignIdentity = value(.codesignIdentity, blank.codesignIdentity)
+        signUnsignedApps = value(.signUnsignedApps, blank.signUnsignedApps)
+        appSigningIdentity = value(.appSigningIdentity, blank.appSigningIdentity)
+        items = value(.items, blank.items)
+    }
 
     // MARK: - Derived values
 

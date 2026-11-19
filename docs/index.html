@@ -111,9 +111,9 @@
         <p>One toggle adds the symlink everyone expects, already sitting in its slot in the bundled background.</p>
       </article>
       <article class="card reveal">
-        <span class="card-icon">🗜️</span>
-        <h3>Five formats</h3>
-        <p>zlib, lzfse, bzip2, lzma or uncompressed — and an optional Developer&nbsp;ID signature on the finished image.</p>
+        <span class="card-icon">🔏</span>
+        <h3>Signing, handled</h3>
+        <p>An app with no signature will not launch on Apple&nbsp;silicon, so unsigned apps are signed on the way in — already-signed ones are never touched. The image itself takes your Developer&nbsp;ID, in any of five formats.</p>
       </article>
       <article class="card reveal">
         <span class="card-icon">🗂️</span>
@@ -139,7 +139,7 @@
       <li class="step reveal">
         <span class="step-n">01</span>
         <h3>Stage</h3>
-        <p>Your app, a hidden <code>.background</code> folder and the <code>Applications</code> symlink are copied into a staging folder with <code>ditto</code>, resource forks intact.</p>
+        <p>Your app, a hidden <code>.background</code> folder and the <code>Applications</code> symlink are copied into a staging folder with <code>ditto</code>, resource forks intact. Any app that arrives unsigned is signed there — the copy, never your original.</p>
       </li>
       <li class="step reveal">
         <span class="step-n">02</span>

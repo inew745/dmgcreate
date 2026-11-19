@@ -70,6 +70,15 @@ final class DMGBuilder {
             args += ["--pos", "\(item.displayName):\(x),\(y)"]
         }
 
+        if data.signUnsignedApps {
+            let appIdentity = data.appSigningIdentity.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !appIdentity.isEmpty {
+                args += ["--app-identity", appIdentity]
+            }
+        } else {
+            args += ["--no-sign-apps"]
+        }
+
         let identity = data.codesignIdentity.trimmingCharacters(in: .whitespacesAndNewlines)
         if !identity.isEmpty {
             args += ["--codesign", identity]

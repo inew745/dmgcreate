@@ -37,6 +37,8 @@ ADD_APPLICATIONS_LINK=0
 REQUIRE_LAYOUT=0
 SKIP_LAYOUT=0
 CODESIGN_IDENTITY=""
+SIGN_APPS=1
+APP_IDENTITY="-"
 QUIET=0
 EXTRA_SIZE_KB=0
 
@@ -86,6 +88,19 @@ OUTPUT
     --format FORMAT         UDZO (zlib, default), UDBZ (bzip2), ULFO (lzfse),
                             ULMO (lzma) or UDRO (uncompressed read-only).
     --codesign IDENTITY     Code-sign the finished .dmg with this identity.
+
+SIGNING THE APPS INSIDE
+    Any .app added to the image is signed on the way in if it carries no
+    signature at all. An unsigned arm64 binary will not launch on Apple
+    silicon, so this is on by default. Apps that are already signed are
+    never touched, so a Developer ID or notarised app keeps its signature.
+
+    --app-identity ID       Identity to sign unsigned apps with. The default
+                            is "-", an ad-hoc signature, which is enough to
+                            make an app launchable. Pass a Developer ID to
+                            sign properly; the hardened runtime and a secure
+                            timestamp are then used as well.
+    --no-sign-apps          Add apps exactly as they are, signature or not.
     --extra-size-kb N       Extra slack to add to the writable staging image.
 
 BEHAVIOUR
@@ -171,6 +186,8 @@ while [ $# -gt 0 ]; do
             POS_X[${#POS_X[@]}]="$SPLIT_1"
             POS_Y[${#POS_Y[@]}]="$SPLIT_2"
             shift 2 ;;
+        --app-identity)   [ $# -ge 2 ] || die "--app-identity needs a value";   APP_IDENTITY="$2"; shift 2 ;;
+        --no-sign-apps)      SIGN_APPS=0; shift ;;
         --applications-link) ADD_APPLICATIONS_LINK=1; shift ;;
         --require-layout)    REQUIRE_LAYOUT=1; shift ;;
         --skip-layout)       SKIP_LAYOUT=1; shift ;;
@@ -224,6 +241,8 @@ case "$FORMAT" in
     UDZO|UDBZ|ULFO|ULMO|UDRO) ;;
     *) die "unsupported --format '$FORMAT' (use UDZO, UDBZ, ULFO, ULMO or UDRO)." ;;
 esac
+
+[ -n "$APP_IDENTITY" ] || die "--app-identity cannot be empty (use \"-\" for an ad-hoc signature)."
 
 if [ -n "$BACKGROUND" ]; then
     [ -f "$BACKGROUND" ] || die "background image not found: $BACKGROUND"
@@ -313,6 +332,60 @@ done
 if [ "$ADD_APPLICATIONS_LINK" -eq 1 ]; then
     log "    + Applications (symlink)"
     ln -s /Applications "$STAGING/Applications"
+fi
+
+# ----------------------------------------------------------------------------
+# sign any app that arrived without a signature
+#
+# This works on the staged copies, never on the originals, and leaves signed
+# apps alone: re-signing one would throw away its Developer ID or notarisation.
+# ----------------------------------------------------------------------------
+if [ "$SIGN_APPS" -eq 1 ] && [ ${#ITEM_NAMES[@]} -gt 0 ]; then
+    if ! command -v codesign >/dev/null 2>&1; then
+        warn "codesign is not installed (it comes with the Xcode command line tools), so apps are being added unsigned."
+    else
+        _i=0
+        while [ "$_i" -lt ${#ITEM_NAMES[@]} ]; do
+            _name="${ITEM_NAMES[$_i]}"
+            _i=$((_i + 1))
+            case "$_name" in
+                *.app) ;;
+                *) continue ;;
+            esac
+            _target="$STAGING/$_name"
+            [ -d "$_target" ] || continue
+
+            if codesign -dv "$_target" >/dev/null 2>&1; then
+                log "    $_name is signed already; leaving it alone"
+                continue
+            fi
+
+            if [ "$APP_IDENTITY" = "-" ]; then
+                step "Ad-hoc signing $_name"
+                set +e
+                _sign_out="$(codesign --force --deep --sign - "$_target" 2>&1)"
+                _sign_status=$?
+                set -e
+            else
+                step "Signing $_name with '$APP_IDENTITY'"
+                set +e
+                _sign_out="$(codesign --force --deep --timestamp --options runtime \
+                    --sign "$APP_IDENTITY" "$_target" 2>&1)"
+                _sign_status=$?
+                set -e
+            fi
+
+            if [ "$_sign_status" -ne 0 ]; then
+                printf '%s\n' "$_sign_out" >&2
+                die "could not sign $_name. Fix the app or pass --no-sign-apps to add it as it is."
+            fi
+            if ! codesign --verify --quiet "$_target" >/dev/null 2>&1; then
+                warn "$_name was signed but does not verify; it may not launch."
+            else
+                log "    $_name signed"
+            fi
+        done
+    fi
 fi
 
 BG_NAME=""

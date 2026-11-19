@@ -13,6 +13,7 @@ struct InspectorView: View {
             windowSection
             contentsSection
             outputSection
+            signingSection
         }
         .formStyle(.grouped)
         .frame(minWidth: 330, idealWidth: 360)
@@ -223,12 +224,36 @@ struct InspectorView: View {
                         Text(format.label).tag(format)
                     }
                 }
+        }
+    }
 
-            TextField("Signing identity", text: Binding(
+    // MARK: - Signing
+
+    private var signingSection: some View {
+        Section("Signing") {
+            Toggle("Sign apps that arrive unsigned", isOn: Binding(
+                get: { model.data.signUnsignedApps },
+                set: { model.data.signUnsignedApps = $0; model.markDirty() }))
+            .help("An app with no signature at all will not launch on Apple silicon. Apps that are already signed are never re-signed.")
+
+            TextField("App identity", text: Binding(
+                get: { model.data.appSigningIdentity },
+                set: { model.data.appSigningIdentity = $0; model.markDirty() }),
+                       prompt: Text("Ad-hoc"))
+            .disabled(!model.data.signUnsignedApps)
+            .help("Leave empty for an ad-hoc signature, which is enough to make an app launch. A Developer ID is used with the hardened runtime and a timestamp.")
+
+            Text(model.data.signUnsignedApps
+                 ? "Only apps with no signature are touched, and only the copy inside the image — your original is left alone."
+                 : "Apps go in exactly as they are. An unsigned app will not open on Apple silicon.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            TextField("Disk image identity", text: Binding(
                 get: { model.data.codesignIdentity },
                 set: { model.data.codesignIdentity = $0; model.markDirty() }),
                        prompt: Text("Optional, e.g. Developer ID Application: …"))
-            .help("Leave empty to ship an unsigned image.")
+            .help("Signs the finished .dmg. Leave empty to ship an unsigned image.")
         }
     }
 

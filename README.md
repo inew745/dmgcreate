@@ -25,6 +25,11 @@ when the image is mounted.
 - **Window size, position, icon size and label size**, all editable.
 - **Custom volume icon** (`.icns`).
 - **Compression**: zlib, lzfse, bzip2, lzma, or uncompressed.
+- **Signs unsigned apps** as they go into the image. An app with no signature
+  at all will not launch on Apple silicon, so this is on by default — ad-hoc
+  unless you give it an identity. An app that is already signed is never
+  re-signed, so a Developer ID or notarised app keeps what it has, and your
+  original is never modified: only the copy inside the image is signed.
 - **Code signing** of the finished image with your Developer ID.
 - **Build list**: every image you make is remembered. Mount it, show it in the
   Finder, or load its settings back in and build it again.
@@ -127,6 +132,10 @@ scripts/make-dmg.sh \
     --applications-link \
     --pos "Applications:471,186"
 ```
+
+Add `--app-identity "Developer ID Application: …"` to sign unsigned apps with a
+real identity instead of ad-hoc, or `--no-sign-apps` to leave them exactly as
+they are.
 
 `scripts/make-dmg.sh --help` lists every option. The app's **terminal button**
 copies the exact command for the project you have open, which is handy for
